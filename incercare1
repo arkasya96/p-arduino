@@ -1,0 +1,80 @@
+#include <LiquidCrystal.h>
+const int v0 = 9;
+const int rs = 1;
+const int E = 2;
+const int d4 = 4;
+const int d5 = 5;
+const int d6 = 6;
+const int d7 = 7;
+int UD = 1;
+int LR = 6;
+const int SW_pin = 13; // digital pin connected to switch output
+const int X_pin = 0; // analog pin connected to X output
+const int Y_pin = 1;
+#include "LedControl.h"
+
+LedControl lc=LedControl(12,11,10,1); // 
+// pin 12 is connected to the MAX7219 pin 1
+// pin 11 is connected to the CLK pin 13
+// pin 10 is connected to LOAD pin 12
+// 1 as we are only using 1 MAX7219
+LiquidCrystal lcd(rs,E,d4,d5,d6,d7); 
+class Ship
+{
+  public:
+    int x;
+    int y;
+    Ship()
+    {
+      x = 1;
+      y = 6;
+    }
+
+    void drawShip()
+    {
+      lc.clearDisplay(0);
+      lc.setLed(0,x,y,true);
+      lc.setLed(0,x-1,y,true);
+      lc.setLed(0,x,y-1,true);
+      lc.setLed(0,x+1,y,true);
+         
+    }
+    void updateCoord()
+    {
+       x = map(LR, 1021, 0, 1, 6); //This maps the values//
+       y = map(UD, 1021, 0, 1, 7);
+      
+    }
+};
+class Bullet
+{
+  public:
+  int x;
+  int y;
+};
+Ship *sheepy = new Ship();
+void setup() {
+  analogWrite(v0,100);
+  lcd.begin(16,2);
+ 
+  lcd.print("<3: ");
+  // put your setup code here, to run once:
+  lc.shutdown(0,false);// turn off power saving, enables display
+  lc.setIntensity(0,8);// sets brightness (0~15 possible values)
+  lc.clearDisplay(0);// clear screen
+  pinMode(SW_pin, INPUT);
+  sheepy->x = 1;
+  sheepy->y = 1;
+}
+
+void loop() 
+  {
+     lcd.setCursor(0,1);
+     lcd.print("Scor:");
+  // put your main code here, to run repeatedly:
+  UD = analogRead(A0);
+  LR = analogRead(A1);
+  sheepy->drawShip();
+  sheepy->updateCoord();
+
+}
